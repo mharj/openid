@@ -4,15 +4,14 @@
     "license": "LGPL 2.1",
     "authors": [
         {
-            "name": "Marko Harjula",
-            "email": "marko.harjula@gmail.com"
+            "name": "Marko Harjula"
         }
     ],
     "minimum-stability": "dev",
     "require": {},
     "autoload": {
        "psr-4": {
-            "openid": "src"
+            "openid\": "src"
        }
     }
 }
