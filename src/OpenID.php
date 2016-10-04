@@ -17,7 +17,7 @@ class OpenID {
 		}
 		// use current url as redirect if not defined
 		if ( $this->openIdConfig->getRedirectUri() == null ) {
-			$this->openIdConfig->setRedirectUri( (isset($_SERVER['HTTPS'])?'https':'http').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] );
+			$this->openIdConfig->setRedirectUri( (isset($_SERVER['HTTPS'])&&strcasecmp($_SERVER['HTTPS'],'on')==0?'https':'http').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] );
 		}
 		$this->getMetadata();
 	}
@@ -45,7 +45,7 @@ class OpenID {
 			"redirect_uri"	=> $this->openIdConfig->getRedirectUri(),
 		);
 		$URL=$this->oid_config->authorization_endpoint."?".http_build_query($params);
-		$_SESSION['__OPENID_REDIRECT']=(isset($_SERVER['HTTPS'])?'https':'http').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+		$_SESSION['__OPENID_REDIRECT']=(isset($_SERVER['HTTPS'])&&strcasecmp($_SERVER['HTTPS'],'on')==0?'https':'http').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 		header('Location: '.$URL);
 		exit;
 	}
