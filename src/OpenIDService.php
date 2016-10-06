@@ -16,13 +16,10 @@ abstract class OpenIDService implements OpenIDServiceInterface {
 	
 	public static function getInstance($code,$openIdConfig) {
 		$class = get_called_class();
-        if (! isset(self::$instance[$class]) ) {
-        	self::$instance[$class] = new $class($code,$openIdConfig); 
-        }
-#        echo "<pre>";
-#        print_r(self::$instance);
-#		echo "</pre>";
-        return self::$instance[$class];
+		if (! isset(self::$instance[$class]) ) {
+			self::$instance[$class] = new $class($code,$openIdConfig); 
+		}
+		return self::$instance[$class];
 	}
 	
 	public function haveValidSSL($validCert=true) {
