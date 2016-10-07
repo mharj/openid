@@ -6,6 +6,7 @@ class OpenID {
 	private $oid_config = null;
 	private $id_body = null;
 	private $code = null;
+	private $ch = null;
 
 	public function __construct(OpenIDConfig $openIdConfig) {
 		if (  $openIdConfig == null ) {
@@ -189,25 +190,28 @@ class OpenID {
 	
 	// curl wrapper
 	private function curlLoader($url,array $header=null,array $post=null,$method=null) {
-		$process = curl_init($url); 
-		curl_setopt($process, CURLOPT_RETURNTRANSFER, 1);
-		if ( $header != null ) {
-			curl_setopt($process, CURLOPT_HTTPHEADER,$header);
+		if ( $this->ch == null ) {
+			$this->ch = curl_init();
+			curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($this->ch, CURLOPT_PROXY, $this->openIdConfig->getHttpProxy() );
+			curl_setopt($this->ch, CURLOPT_TIMEOUT, 10);
+			curl_setopt($this->ch, CURLOPT_FAILONERROR,false);
 		}
-		curl_setopt($process, CURLOPT_PROXY, $this->openIdConfig->getHttpProxy() );
+		curl_setopt($this->ch, CURLOPT_URL,$url); 
+		curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
 		if ( $post != null ) {
-			curl_setopt($process, CURLOPT_POST, 1);
-			curl_setopt($process, CURLOPT_POSTFIELDS, http_build_query($post) );
+			curl_setopt($this->ch, CURLOPT_POST, true);
+			curl_setopt($this->ch, CURLOPT_POSTFIELDS, http_build_query($post) );
+		} else {
+			curl_setopt($this->ch, CURLOPT_POST, false);
+			curl_setopt($this->ch, CURLOPT_POSTFIELDS, null);
 		}
-		curl_setopt($process, CURLOPT_TIMEOUT, 10);
-		curl_setopt($process, CURLOPT_FAILONERROR,false);
-		$return = curl_exec($process);
+		$return = curl_exec($this->ch);
 		if( $return === false ) {
-			throw new OpenIDException(curl_error($process));
+			throw new OpenIDException(curl_error($this->ch));
 		}
-		curl_close($process);
 		return $return;
-	}
+	}	
 	
 	/**
 	 * get all certificates for kid's
