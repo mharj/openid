@@ -203,8 +203,8 @@ class OpenID {
 		}
 		curl_setopt($this->ch, CURLOPT_PROXY, $this->openIdConfig->getHttpProxy() );
 		if ( $post == null ) {
+			curl_setopt($this->ch, CURLOPT_POSTFIELDS,array());
 			curl_setopt($this->ch, CURLOPT_POST, 0);
-			curl_setopt($this->ch, CURLOPT_POSTFIELDS,null);
 		} else  {
 			curl_setopt($this->ch, CURLOPT_POST, 1);
 			if ( is_array($post) ) {
