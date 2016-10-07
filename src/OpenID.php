@@ -202,7 +202,10 @@ class OpenID {
 			curl_setopt($this->ch, CURLOPT_HTTPHEADER,$header);
 		}
 		curl_setopt($this->ch, CURLOPT_PROXY, $this->openIdConfig->getHttpProxy() );
-		if ( $post != null ) {
+		if ( $post == null ) {
+			curl_setopt($this->ch, CURLOPT_POST, 0);
+			curl_setopt($this->ch, CURLOPT_POSTFIELDS,null);
+		} else  {
 			curl_setopt($this->ch, CURLOPT_POST, 1);
 			if ( is_array($post) ) {
 				curl_setopt($this->ch, CURLOPT_POSTFIELDS, http_build_query($post) );
