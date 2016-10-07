@@ -8,6 +8,7 @@ abstract class OpenIDService implements OpenIDServiceInterface {
 	private $accessToken = null;
 	private $openIdConfig = null;
 	protected $validCert = true;
+	protected $ch = null;
 	
 	protected function __construct($code,$openIdConfig) {
 		$this->code = $code;
