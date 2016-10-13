@@ -46,7 +46,7 @@ class URL {
 	}
 	
 	public static function create(string $uri) {
-		$ins = new URI();
+		$ins = new URL();
 		$ins->parse($uri);
 		return $ins;
 	}
@@ -56,7 +56,7 @@ class URL {
 			$this->scheme = $match[1];
 			$uri = substr($uri, (strlen($this->scheme)+1) , strlen($uri));
 		}
-		if ( preg_match("/^\/\/(.*?)[\/,$]/",$uri,$match) ) {
+		if ( preg_match("/^\/\/(.*?)(\/|$)/",$uri,$match) ) {
 			$this->authority=$match[1];
 			$uri = substr($uri, (strlen($this->authority)+2) , strlen($uri));
 			if ( preg_match("/^(.*?)@(.*?)$/",$this->authority,$sub) ) {
