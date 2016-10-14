@@ -6,6 +6,8 @@ class HttpResponse {
 	private $data;
 	private $headers = array();
 	private $url;
+	private $method = null;
+	private $uploadSize = 0;
 	
 	public function setStatusCode(int $statusCode) {
 		$this->statusCode = $statusCode;
@@ -23,4 +25,16 @@ class HttpResponse {
 	public function setUrl(string $url) {
 		$this->url = $url;
 	}
+	public function setMethod(string $method) {
+		$this->method = $method;
+	}
+	public function getMethod() {
+		return $this->method;
+	}
+	public function setUploadSize(int $size) {
+		$this->uploadSize = $size;
+	}
+	public function getUploadSize(): int {
+		return $this->uploadSize;
+	}	
 }
