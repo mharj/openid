@@ -8,7 +8,15 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+		"mharj/net": "dev-master"
+	},
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/mharj/net"
+        }
+    ],
     "autoload": {
        "psr-4": {
             "openid\\": "src"
