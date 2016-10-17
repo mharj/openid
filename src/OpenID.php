@@ -1,14 +1,22 @@
 <?php
 namespace openid;
 
+use mharj\net\HttpRequest;
+use mharj\net\URL;
+use mharj\net\HttpClientFactory;
+use mharj\net\HttpResponse;
+
 class OpenID {
 	private $openIdConfig = null;
 	private $oid_config = null;
 	private $id_body = null;
 	private $code = null;
 	private $ch = null;
-
+	private $validCert = null;
+	private $curl = null;
+	
 	public function __construct(OpenIDConfig $openIdConfig) {
+		$this->curl = HttpClientFactory::getDefaultInstance();
 		if (  $openIdConfig == null ) {
 			throw new OpenIDException("empty config!");
 		}
@@ -26,7 +34,13 @@ class OpenID {
 	// store OpenID connection configuration to session, so only need to use this when new session happens
 	public function getMetadata() {
 		if ( ! isset($_SESSION['__OPENID_CONFIG_METADATA'] ) ) {
-			$_SESSION['__OPENID_CONFIG_METADATA']=$this->curlLoader( $this->openIdConfig->getDomainConfigurationUri() );
+			$resp = $this->curl->sendRequest( new HttpRequest( URL::create($this->openIdConfig->getDomainConfigurationUri()) ) );
+			if ( $resp->getStatusCode() == HttpResponse::HTTP_OK ) {
+				$_SESSION['__OPENID_CONFIG_METADATA'] = $resp->getData();
+			}
+		}
+		if ( ! isset($_SESSION['__OPENID_CONFIG_METADATA'] ) ) {
+			throw new OpenIDException("can't load OpenID metadata");
 		}
 		$this->oid_config = json_decode($_SESSION['__OPENID_CONFIG_METADATA']);
 		if ( ! in_array($this->openIdConfig->getResponseType(),$this->oid_config->response_types_supported) ) {
@@ -34,8 +48,7 @@ class OpenID {
 		}
 	}
 	
-	// auth redirect to service
-	public function doAuth($scope) {
+	public function getAuthUrl($scope) {
 		$_SESSION['__OPENID_NONCE'] = OpenIDNonce::makeNonce();
 		$params = array(
 			"response_type"	=> $this->openIdConfig->getResponseType(),
@@ -45,9 +58,13 @@ class OpenID {
 			"response_mode"	=> "form_post",
 			"redirect_uri"	=> $this->openIdConfig->getRedirectUri(),
 		);
-		$URL=$this->oid_config->authorization_endpoint."?".http_build_query($params);
+		return $this->oid_config->authorization_endpoint."?".http_build_query($params);
+	}
+	
+	// auth redirect to service
+	public function doAuth($scope) {
 		$_SESSION['__OPENID_REDIRECT']=(isset($_SERVER['HTTPS'])&&strcasecmp($_SERVER['HTTPS'],'on')==0?'https':'http').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-		header('Location: '.$URL);
+		header('Location: '.$this->getAuthUrl($scope));
 		exit;
 	}
 	/**
@@ -190,6 +207,7 @@ class OpenID {
 	
 	// curl wrapper
 	private function curlLoader($url,array $header=null,$post=null,$method=null) {
+		trigger_error("curlLoader", E_USER_DEPRECATED );
 		if ( $this->ch == null ) {
 			$this->ch = curl_init();
 		}
