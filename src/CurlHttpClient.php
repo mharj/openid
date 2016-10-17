@@ -6,7 +6,6 @@ class CurlHttpClient extends HttpClient {
 	public function __construct() {
 		$this->ch = curl_init();
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($this->ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($this->ch, CURLOPT_FAILONERROR, false);
 		curl_setopt($this->ch, CURLINFO_HEADER_OUT, true);
 	}
@@ -24,6 +23,7 @@ class CurlHttpClient extends HttpClient {
 
 	public function sendRequest(HttpRequest $req): HttpResponse {
 		$ret = new HttpResponse();
+		curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeOut );
 		curl_setopt($this->ch, CURLOPT_URL, $req->getUrl()->toString() );
 		curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST,$req->getMethod());
 		curl_setopt($this->ch, CURLOPT_HTTPHEADER,$req->getHeaders());
